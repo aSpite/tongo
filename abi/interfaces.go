@@ -8,6 +8,7 @@ import (
 
 const (
 	IUnknown ContractInterface = iota
+	AffluentVault
 	AirdropInterlockerV1
 	AirdropInterlockerV2
 	BidaskInternalLiquidityVault
@@ -121,6 +122,8 @@ const (
 
 func (c ContractInterface) String() string {
 	switch c {
+	case AffluentVault:
+		return "affluent_vault"
 	case AirdropInterlockerV1:
 		return "airdrop_interlocker_v1"
 	case AirdropInterlockerV2:
@@ -346,6 +349,8 @@ func (c ContractInterface) String() string {
 
 func ContractInterfaceFromString(s string) ContractInterface {
 	switch s {
+	case "affluent_vault":
+		return AffluentVault
 	case "airdrop_interlocker_v1":
 		return AirdropInterlockerV1
 	case "airdrop_interlocker_v2":
@@ -1055,6 +1060,10 @@ var methodInvocationOrder = []MethodDescription{
 		InvokeFn: IsStable,
 	},
 	{
+		Name:     "is_strategy_vault",
+		InvokeFn: IsStrategyVault,
+	},
+	{
 		Name:     "jetton_wallet_lock_data",
 		InvokeFn: JettonWalletLockData,
 	},
@@ -1081,6 +1090,14 @@ var methodInvocationOrder = []MethodDescription{
 }
 
 var contractInterfacesOrder = []InterfaceDescription{
+	{
+		Name: AffluentVault,
+		Results: []string{
+			"GetJettonDataResult",
+			"GetVaultData_AffluentResult",
+			"IsStrategyVault_AffluentResult",
+		},
+	},
 	{
 		Name: BidaskPool,
 		Results: []string{
@@ -1892,6 +1909,11 @@ var knownContracts = map[ton.Bits256]knownContractDescription{
 
 func (c ContractInterface) IntMsgs() []msgDecoderFunc {
 	switch c {
+	case AffluentVault:
+		return []msgDecoderFunc{
+			decodeFuncTakeAggregatedDataDepositMsgBody,
+			decodeFuncTakeAggregatedDataWithdrawMsgBody,
+		}
 	case BidaskInternalLiquidityVault:
 		return []msgDecoderFunc{
 			decodeFuncBidaskSaveLiquidityInfoMsgBody,
